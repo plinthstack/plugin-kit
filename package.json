@@ -1,0 +1,12 @@
+{
+	"name": "@plinthstack/plugin-kit",
+	"version": "0.1.0",
+	"description": "Shared tooling and scaffold for PlinthStack WordPress plugins.",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/plinthstack/plugin-kit",
+	"bugs": "https://github.com/plinthstack/plugin-kit/issues",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/plinthstack/plugin-kit.git"
+	}
+}
