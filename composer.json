@@ -1,0 +1,17 @@
+{
+	"name": "plinthstack/plugin-kit",
+	"description": "Shared tooling and scaffold for PlinthStack WordPress plugins.",
+	"type": "library",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/plinthstack/plugin-kit",
+	"support": {
+		"issues": "https://github.com/plinthstack/plugin-kit/issues",
+		"source": "https://github.com/plinthstack/plugin-kit"
+	},
+	"require": {
+		"php": ">=8.1"
+	},
+	"config": {
+		"sort-packages": true
+	}
+}
