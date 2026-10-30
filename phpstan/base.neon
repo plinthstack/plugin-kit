@@ -1,0 +1,5 @@
+parameters:
+	level: max
+	scanFiles:
+		# WP_UnitTestCase lives in the test suite, which only exists inside the container.
+		- %rootDir%/../../php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php
