@@ -44,9 +44,9 @@ sniffs override.xml violation.php 'PHPCompatibility.FunctionUse.RemovedFunctions
 # Runs PHPStan with the sample config and compares the identifier:line pairs it reports.
 analyse() {
 	local out status got
-	out=$(vendor/bin/phpstan analyse --memory-limit=1G --no-progress --error-format=raw -c tests/phpstan/phpstan.neon "tests/phpstan/$1" 2>&1)
+	out=$(vendor/bin/phpstan analyse --memory-limit=1G --no-progress --error-format=json -c tests/phpstan/phpstan.neon "tests/phpstan/$1" 2>/dev/null)
 	status=$?
-	got=$(echo "$out" | sed -n 's/^[^:]*:\([0-9]*\):.*\[identifier=\(.*\)\]$/\2:\1/p' | sort | tr '\n' ' ')
+	got=$(echo "$out" | php tests/phpstan-ids.php | sort | tr '\n' ' ')
 	if { [ -z "$2" ] && [ "$status" -ne 0 ]; } || [ "$got" != "$2" ]; then
 		echo "FAIL phpstan $1: exit $status, got [$got], expected [$2]"
 		echo "$out"
