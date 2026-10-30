@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+/**
+ * plugin-kit command line.
+ *
+ * @package PlinthStack\PluginKit
+ */
+
+require $_composer_autoload_path ?? dirname( __DIR__ ) . '/vendor/autoload.php';
+
+$command = $argv[1] ?? '';
+
+if ( 'validate' !== $command ) {
+	fwrite( STDERR, "Usage: plugin-kit validate [path]\n" );
+	exit( 2 );
+}
+
+$path   = $argv[2] ?? 'plugin-kit.json';
+$errors = PlinthStack\PluginKit\Validate::errors( $path );
+
+foreach ( $errors as $error ) {
+	fwrite( STDERR, $error . "\n" );
+}
+if ( $errors ) {
+	exit( 1 );
+}
+echo "{$path} is valid\n";

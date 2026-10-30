@@ -1,0 +1,11 @@
+{
+	"slug": "plinthstack-demo",
+	"name": "PlinthStack Demo",
+	"namespace": "PlinthStack\\Demo",
+	"prefix": "plinthstack_demo",
+	"text_domain": "plinthstack-demo",
+	"requires_wp": "6.7",
+	"requires_php": "8.1",
+	"tested_up_to": "7.1",
+	"tier": "gold"
+}
