@@ -20,6 +20,9 @@
 	"bin": [
 		"bin/plugin-kit"
 	],
+	"scripts": {
+		"test": "tests/fixtures.sh"
+	},
 	"config": {
 		"sort-packages": true
 	}
