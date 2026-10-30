@@ -1,0 +1,11 @@
+{
+	"slug": "acme-widgets",
+	"name": "Acme Widgets",
+	"namespace": "Acme\\Widgets",
+	"prefix": "acme_widgets",
+	"text_domain": "acme-widgets",
+	"requires_wp": "6.7",
+	"requires_php": "8.1",
+	"tested_up_to": "7.1",
+	"tier": "free"
+}
