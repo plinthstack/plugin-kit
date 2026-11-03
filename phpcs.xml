@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<ruleset name="PlinthStack Plugin Kit">
+	<file>src</file>
+	<file>tests/phpstan-ids.php</file>
+	<arg name="basepath" value="."/>
+
+	<rule ref="./phpcs/ruleset.xml"/>
+
+	<config name="text_domain" value="plinthstack-plugin-kit"/>
+	<config name="testVersion" value="8.1-"/>
+
+	<!-- PSR-4 names the file after its class, which these two sniffs reject. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>*/src/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>*/src/*</exclude-pattern>
+	</rule>
+
+	<!-- The kit runs as a CLI, not inside WordPress: it writes to STDOUT and STDERR. -->
+	<rule ref="WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fwrite">
+		<severity>0</severity>
+	</rule>
+	<!-- It reads only local files: its bundled schema and a config path that must pass is_file(). -->
+	<rule ref="WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown">
+		<severity>0</severity>
+	</rule>
+</ruleset>
