@@ -34,7 +34,11 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
-      - run: npm pack --dry-run
+      - name: Check the packed files
+        shell: bash
+        run: |
+          packed=$(npm pack --dry-run --json --ignore-scripts | jq -r '.[0].files[].path' | LC_ALL=C sort)
+          diff <(printf '%s\n' LICENSE README.md package.json | LC_ALL=C sort) <(echo "$packed")
 
   actionlint:
     name: actionlint
