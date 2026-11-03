@@ -30,6 +30,7 @@
 	"bin": [
 		"bin/plugin-kit"
 	],
+	"prefer-stable": true,
 	"scripts": {
 		"test": [
 			"phpcs -q",
@@ -38,6 +39,9 @@
 		]
 	},
 	"config": {
+		"platform": {
+			"php": "8.1"
+		},
 		"sort-packages": true,
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
