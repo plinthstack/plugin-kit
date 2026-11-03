@@ -35,3 +35,14 @@ jobs:
         with:
           node-version: '24'
       - run: npm pack --dry-run
+
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: docker://rhysd/actionlint:1.7.12
+        with:
+          args: -color
