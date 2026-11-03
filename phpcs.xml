@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <ruleset name="PlinthStack Plugin Kit">
 	<file>src</file>
-	<file>tests/phpstan-ids.php</file>
+	<file>tests</file>
+	<!-- Sample plugins with planted violations; tests/fixtures.sh checks them. -->
+	<exclude-pattern>*/tests/phpcs/*</exclude-pattern>
+	<exclude-pattern>*/tests/phpstan/*</exclude-pattern>
 	<arg name="basepath" value="."/>
 
 	<rule ref="./phpcs/ruleset.xml"/>

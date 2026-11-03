@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
-# Runs bin/plugin-kit validate on every fixture, and PHPCS and PHPStan on the sample plugins, and checks the results.
+# Runs bin/plugin-kit on every fixture, and PHPCS and PHPStan on the sample plugins, and checks the results.
 set -u
 cd "$(dirname "$0")/.." || exit 1
 fail=0
 
+# Runs bin/plugin-kit with the given arguments and compares its exit code and whole output.
 check() {
-	local out got
-	out=$(bin/plugin-kit validate "$1" 2>&1)
+	local status=$1 expected=$2 out got
+	shift 2
+	out=$(bin/plugin-kit "$@" 2>&1)
 	got=$?
-	if [ "$got" -ne "$2" ] || { [ -n "${3:-}" ] && [[ "$out" != "$3"* ]]; }; then
-		echo "FAIL $1: exit $got, expected $2${3:+ naming $3}"
+	if [ "$got" -ne "$status" ] || [ "$out" != "$expected" ]; then
+		echo "FAIL plugin-kit $*: exit $got, expected $status and [$expected]"
 		echo "$out"
 		fail=1
 	else
-		echo "ok   $1"
+		echo "ok   plugin-kit $*"
 	fi
 }
 
-check tests/fixtures/valid.json 0
-check tests/fixtures/invalid-missing.json 1 'slug:'
-check tests/fixtures/invalid-type.json 1 'requires_php:'
-check tests/fixtures/invalid-tier.json 1 'tier: Does not have a value in the enumeration ["free","premium"]'
+check 2 'Usage: plugin-kit validate [path]'
+check 0 'tests/fixtures/valid.json is valid' validate tests/fixtures/valid.json
+check 1 'slug: The property slug is required' validate tests/fixtures/invalid-missing.json
+check 1 'requires_php: Double value found, but a string is required' validate tests/fixtures/invalid-type.json
+check 1 'tier: Does not have a value in the enumeration ["free","premium"]' validate tests/fixtures/invalid-tier.json
+check 1 '(root): NULL value found, but an object is required' validate tests/fixtures/invalid-root.json
 
 # Runs PHPCS with a sample config and compares the sniff codes it reports.
 sniffs() {
@@ -58,5 +62,13 @@ analyse() {
 
 analyse clean.php ''
 analyse violation.php 'argument.type:20 property.nonObject:12 '
+
+# PHPStan reports some errors, such as an unmatched ignore pattern, outside any file.
+if [ "$(printf '{"files":[],"errors":["x"]}' | php tests/phpstan-ids.php)" = 'none:0' ]; then
+	echo "ok   phpstan-ids.php top-level errors"
+else
+	echo "FAIL phpstan-ids.php drops top-level errors"
+	fail=1
+fi
 
 exit $fail

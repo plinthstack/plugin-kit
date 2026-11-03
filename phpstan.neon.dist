@@ -1,0 +1,12 @@
+includes:
+	- phpstan/base.neon
+
+parameters:
+	paths:
+		- src
+		- bin/plugin-kit
+		- tests
+	excludePaths:
+		# Sample plugins with planted errors; tests/fixtures.sh checks them.
+		- tests/phpcs
+		- tests/phpstan
