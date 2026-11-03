@@ -6,8 +6,11 @@
  */
 
 $plugin_kit_report = json_decode( (string) stream_get_contents( STDIN ), true );
-foreach ( $plugin_kit_report['files'] ?? array() as $plugin_kit_file ) {
-	foreach ( $plugin_kit_file['messages'] as $plugin_kit_message ) {
-		echo $plugin_kit_message['identifier'], ':', $plugin_kit_message['line'], "\n";
+$plugin_kit_files  = is_array( $plugin_kit_report ) && is_array( $plugin_kit_report['files'] ?? null ) ? $plugin_kit_report['files'] : array();
+foreach ( $plugin_kit_files as $plugin_kit_file ) {
+	$plugin_kit_messages = is_array( $plugin_kit_file ) && is_array( $plugin_kit_file['messages'] ?? null ) ? $plugin_kit_file['messages'] : array();
+	foreach ( $plugin_kit_messages as $plugin_kit_message ) {
+		$plugin_kit_message = is_array( $plugin_kit_message ) ? $plugin_kit_message : array();
+		echo is_string( $plugin_kit_message['identifier'] ?? null ) ? $plugin_kit_message['identifier'] : 'none', ':', is_int( $plugin_kit_message['line'] ?? null ) ? $plugin_kit_message['line'] : 0, "\n";
 	}
 }

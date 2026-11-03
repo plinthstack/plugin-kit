@@ -36,8 +36,9 @@ class Validate {
 
 		$errors = array();
 		foreach ( $validator->getErrors() as $error ) {
-			$field    = '' !== $error['property'] ? $error['property'] : '(root)';
-			$errors[] = "{$field}: {$error['message']}";
+			$property = is_array( $error ) && is_string( $error['property'] ?? null ) ? $error['property'] : '';
+			$message  = is_array( $error ) && is_string( $error['message'] ?? null ) ? $error['message'] : 'invalid';
+			$errors[] = ( '' !== $property ? $property : '(root)' ) . ": {$message}";
 		}
 		return $errors;
 	}
