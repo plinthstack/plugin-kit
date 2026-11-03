@@ -37,4 +37,4 @@ Its own `scanFiles` add to the kit's. Run it with `vendor/bin/phpstan analyse --
 
 ## Development
 
-`composer test` runs `plugin-kit validate` against `tests/fixtures/` and PHPCS and PHPStan against the sample plugins in `tests/phpcs/` and `tests/phpstan/`.
+`composer test` runs `plugin-kit validate` against `tests/fixtures/` and PHPCS and PHPStan against the sample plugins in `tests/phpcs/` and `tests/phpstan/`. CI also runs actionlint on `.github/workflows/`. Run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12`.
