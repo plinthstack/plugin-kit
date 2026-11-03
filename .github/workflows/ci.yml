@@ -34,11 +34,14 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
       - name: Check the packed files
         shell: bash
         run: |
           packed=$(npm pack --dry-run --json --ignore-scripts | jq -r '.[0].files[].path' | LC_ALL=C sort)
-          diff <(printf '%s\n' LICENSE README.md package.json | LC_ALL=C sort) <(echo "$packed")
+          diff <(printf '%s\n' LICENSE README.md package.json prettier.config.js | LC_ALL=C sort) <(echo "$packed")
 
   actionlint:
     name: actionlint
