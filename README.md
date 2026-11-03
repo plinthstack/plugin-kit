@@ -1,13 +1,29 @@
 # plugin-kit
 Shared tooling and scaffold for PlinthStack WordPress plugins
 
-Requires PHP 8.1 or later.
+## Requirements
+
+- PHP 8.1 or later.
+- The kit brings PHPCS, PHPStan and their extensions, so a plugin requires none of them itself (PHPCompatibility 10 is an opt-in; see PHPCS below). Its `composer.json` needs this `config`:
+
+  ```json
+  "config": {
+  	"allow-plugins": {
+  		"dealerdirect/phpcodesniffer-composer-installer": true,
+  		"phpstan/extension-installer": true
+  	}
+  }
+  ```
 
 ## Usage
+
+### Validate plugin-kit.json
 
 `vendor/bin/plugin-kit validate [path]` checks a plugin's `plugin-kit.json` (default `./plugin-kit.json`) against the schema and exits 1 with one line per problem.
 
 Add `"$schema": "./vendor/plinthstack/plugin-kit/schema/plugin-kit.schema.json"` to the file for editor hints.
+
+### PHPCS
 
 A plugin's `phpcs.xml` includes the shared ruleset, then adds its own values:
 
@@ -19,11 +35,25 @@ A plugin's `phpcs.xml` includes the shared ruleset, then adds its own values:
 <config name="testVersion" value="8.1-"/>
 ```
 
-The kit brings PHPCS, PHPStan and their extensions, so a plugin needs only `"config": { "allow-plugins": { "dealerdirect/phpcodesniffer-composer-installer": true, "phpstan/extension-installer": true } }` in its `composer.json`. `testVersion` is required: PHPCompatibility stops with an internal error without it. Rules added after the include override the kit's; the kit sets no `<config>` values, since PHPCS would let them override the plugin's. For PHPCompatibility 10's PHP 8 checks, also require `"phpcompatibility/php-compatibility": "^10.0@alpha"`.
+- `testVersion` is required: PHPCompatibility stops with an internal error without it.
+- Rules added after the include override the kit's.
+- The kit sets no `<config>` values, since PHPCS would let them override the plugin's.
+- For PHPCompatibility 10's PHP 8 checks, also require `"phpcompatibility/php-compatibility": "^10.0@alpha"`.
 
-The ruleset warns when a function's cyclomatic complexity passes 10 or its nesting passes 5, and errors above 20 and 10; `phpcs` exits non-zero on either, so both fail CI. A plugin changes a limit with a `<property>` on `Generic.Metrics.CyclomaticComplexity` (`complexity`, `absoluteComplexity`) or `Generic.Metrics.NestingLevel` (`nestingLevel`, `absoluteNestingLevel`).
+#### Complexity limits
 
-A plugin's `phpstan.neon.dist` includes the base config (`level: max`, WordPress and PHPUnit extensions, the WordPress test-suite stubs), then lists its own `paths`:
+The ruleset limits each function's cyclomatic complexity and nesting:
+
+| Sniff | Warning above | Warning property | Error above | Error property |
+|---|---|---|---|---|
+| `Generic.Metrics.CyclomaticComplexity` | 10 | `complexity` | 20 | `absoluteComplexity` |
+| `Generic.Metrics.NestingLevel` | 5 | `nestingLevel` | 10 | `absoluteNestingLevel` |
+
+`phpcs` exits non-zero on warnings and errors alike, so both fail a plugin's `phpcs` run. A plugin changes a limit with a `<property>` on the sniff, after the include.
+
+### PHPStan
+
+A plugin's `phpstan.neon.dist` includes the base config (`level: max` and the WordPress test-suite stubs), then lists its own `paths`:
 
 ```neon
 includes:
@@ -35,8 +65,34 @@ parameters:
 		- inc
 ```
 
-Its own `scanFiles` add to the kit's. Run it with `vendor/bin/phpstan analyse --memory-limit=1G`; the WordPress stubs need more than PHP's default 128M.
+- `phpstan/extension-installer` loads the WordPress and PHPUnit extensions.
+- A plugin's own `scanFiles` add to the kit's.
+- Run it with `vendor/bin/phpstan analyse --memory-limit=1G`; the WordPress stubs need more than PHP's default 128M.
 
 ## Development
 
-`composer test` runs PHPCS (`phpcs.xml`) and PHPStan (`phpstan.neon.dist`) on the kit's own PHP, then `plugin-kit validate` against `tests/fixtures/` and PHPCS and PHPStan against the sample plugins in `tests/phpcs/` and `tests/phpstan/`. Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to check the kit alone. CI also runs actionlint on `.github/workflows/`. Run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12`. The `npm` job fails unless the npm tarball holds exactly the paths in its expected list; a new shared config goes in `package.json` `files` and, with every file path it packs, in that list. Dependabot checks the Composer and GitHub Actions dependencies (npm once #5 adds them) weekly and opens a PR per update; the actionlint image is bumped by hand, since Dependabot skips `docker://` references.
+### Tests
+
+`composer test` runs, in order:
+
+1. PHPCS (`phpcs.xml`) and PHPStan (`phpstan.neon.dist`) on the kit's own PHP.
+2. `plugin-kit` with no arguments (usage message) and `plugin-kit validate` against `tests/fixtures/`.
+3. PHPCS and PHPStan against the sample plugins in `tests/phpcs/` and `tests/phpstan/`.
+4. A self-test of `tests/phpstan-ids.php` for errors PHPStan reports outside any file.
+
+Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to check the kit alone.
+
+### CI
+
+| Job | Checks |
+|---|---|
+| `php` | `composer validate --strict`, then `composer test` |
+| `npm` | The npm tarball holds exactly the paths in the job's expected list |
+| `actionlint` | `.github/workflows/`; run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12` |
+
+A new shared config goes in `package.json` `files` and, with every file path it packs, in the `npm` job's expected list.
+
+### Dependencies
+
+- Dependabot checks the Composer and GitHub Actions dependencies (npm once #5 adds them) weekly and opens a PR per update.
+- The actionlint image is bumped by hand, since Dependabot skips `docker://` references.
