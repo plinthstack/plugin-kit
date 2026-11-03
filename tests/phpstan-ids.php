@@ -1,6 +1,6 @@
 <?php
 /**
- * Prints identifier:line for each error in PHPStan's JSON output on stdin.
+ * Prints identifier:line for each error in PHPStan's JSON output on stdin; errors outside a file print as none:0.
  *
  * @package PlinthStack\PluginKit
  */
@@ -16,3 +16,5 @@ foreach ( $plugin_kit_files as $plugin_kit_file ) {
 		fwrite( STDOUT, "{$plugin_kit_id}:{$plugin_kit_line}\n" );
 	}
 }
+$plugin_kit_errors = is_array( $plugin_kit_report ) && is_array( $plugin_kit_report['errors'] ?? null ) ? $plugin_kit_report['errors'] : array();
+fwrite( STDOUT, str_repeat( "none:0\n", count( $plugin_kit_errors ) ) );

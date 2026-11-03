@@ -31,7 +31,11 @@
 		"bin/plugin-kit"
 	],
 	"scripts": {
-		"test": "tests/fixtures.sh"
+		"test": [
+			"phpcs -q",
+			"phpstan analyse --memory-limit=1G --no-progress",
+			"tests/fixtures.sh"
+		]
 	},
 	"config": {
 		"sort-packages": true,

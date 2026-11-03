@@ -37,4 +37,4 @@ Its own `scanFiles` add to the kit's. Run it with `vendor/bin/phpstan analyse --
 
 ## Development
 
-`composer test` runs `plugin-kit validate` against `tests/fixtures/` and PHPCS and PHPStan against the sample plugins in `tests/phpcs/` and `tests/phpstan/`. CI also runs actionlint on `.github/workflows/`. Run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12`.
+`composer test` runs PHPCS (`phpcs.xml`) and PHPStan (`phpstan.neon.dist`) on the kit's own PHP, then `plugin-kit validate` against `tests/fixtures/` and PHPCS and PHPStan against the sample plugins in `tests/phpcs/` and `tests/phpstan/`. Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to check the kit alone. CI also runs actionlint on `.github/workflows/`. Run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12`.
