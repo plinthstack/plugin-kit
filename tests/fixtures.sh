@@ -44,6 +44,8 @@ sniffs() {
 sniffs phpcs.xml clean.php ''
 sniffs phpcs.xml violation.php 'PHPCompatibility.FunctionUse.RemovedFunctions.eachDeprecated WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound WordPress.PHP.YodaConditions.NotYoda WordPress.WP.AlternativeFunctions.file_system_operations_readfile WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter '
 sniffs override.xml violation.php 'PHPCompatibility.FunctionUse.RemovedFunctions.eachDeprecated WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound WordPress.PHP.YodaConditions.NotYoda WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter '
+sniffs phpcs.xml complex.php 'Generic.Metrics.CyclomaticComplexity.TooHigh Generic.Metrics.NestingLevel.TooHigh '
+sniffs override.xml complex.php ''
 
 # Runs PHPStan with the sample config and compares the identifier:line pairs it reports.
 analyse() {

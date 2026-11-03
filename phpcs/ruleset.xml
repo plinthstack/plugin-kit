@@ -14,6 +14,8 @@
 	<rule ref="WordPress"/>
 	<rule ref="WordPress-VIP-Go"/>
 	<rule ref="PHPCompatibilityWP"/>
+	<rule ref="Generic.Metrics.CyclomaticComplexity"/>
+	<rule ref="Generic.Metrics.NestingLevel"/>
 
 	<!-- VIP turns these off; Plugin Check, which wordpress.org runs, does not. -->
 	<rule ref="WordPress.Security.EscapeOutput.ExceptionNotEscaped">

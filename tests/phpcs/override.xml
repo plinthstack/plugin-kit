@@ -5,4 +5,15 @@
 	<rule ref="WordPress.WP.AlternativeFunctions.file_system_operations_readfile">
 		<severity>0</severity>
 	</rule>
+
+	<rule ref="Generic.Metrics.CyclomaticComplexity">
+		<properties>
+			<property name="complexity" value="11"/>
+		</properties>
+	</rule>
+	<rule ref="Generic.Metrics.NestingLevel">
+		<properties>
+			<property name="nestingLevel" value="6"/>
+		</properties>
+	</rule>
 </ruleset>

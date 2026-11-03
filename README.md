@@ -21,6 +21,8 @@ A plugin's `phpcs.xml` includes the shared ruleset, then adds its own values:
 
 The kit brings PHPCS, PHPStan and their extensions, so a plugin needs only `"config": { "allow-plugins": { "dealerdirect/phpcodesniffer-composer-installer": true, "phpstan/extension-installer": true } }` in its `composer.json`. `testVersion` is required: PHPCompatibility stops with an internal error without it. Rules added after the include override the kit's; the kit sets no `<config>` values, since PHPCS would let them override the plugin's. For PHPCompatibility 10's PHP 8 checks, also require `"phpcompatibility/php-compatibility": "^10.0@alpha"`.
 
+The ruleset warns when a function's cyclomatic complexity passes 10 or its nesting passes 5, and errors above 20 and 10; `phpcs` exits non-zero on either, so both fail CI. A plugin changes a limit with a `<property>` on `Generic.Metrics.CyclomaticComplexity` (`complexity`, `absoluteComplexity`) or `Generic.Metrics.NestingLevel` (`nestingLevel`, `absoluteNestingLevel`).
+
 A plugin's `phpstan.neon.dist` includes the base config (`level: max`, WordPress and PHPUnit extensions, the WordPress test-suite stubs), then lists its own `paths`:
 
 ```neon
