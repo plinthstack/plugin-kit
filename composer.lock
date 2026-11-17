@@ -58,8 +58,7 @@
                 "source": "https://github.com/Automattic/VIP-Coding-Standards",
                 "wiki": "https://github.com/Automattic/VIP-Coding-Standards/wiki"
             },
-            "time": "2026-07-27T14:33:48+00:00",
-            "published-time": "2026-07-27T14:37:08+00:00"
+            "time": "2026-07-27T14:33:48+00:00"
         },
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -155,8 +154,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-05-06T08:26:05+00:00",
-            "published-time": "2026-05-06T12:56:03+00:00"
+            "time": "2026-05-06T08:26:05+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -221,8 +219,7 @@
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
                 "source": "https://github.com/jsonrainbow/json-schema/tree/6.14.0"
             },
-            "time": "2026-10-24T08:53:34+00:00",
-            "published-time": "2026-10-24T08:53:38+00:00"
+            "time": "2026-10-24T08:53:34+00:00"
         },
         {
             "name": "marc-mabe/php-enum",
@@ -295,8 +292,7 @@
                 "issues": "https://github.com/marc-mabe/php-enum/issues",
                 "source": "https://github.com/marc-mabe/php-enum/tree/v4.7.2"
             },
-            "time": "2025-09-14T11:18:39+00:00",
-            "published-time": "2025-09-14T11:32:17+00:00"
+            "time": "2025-09-14T11:18:39+00:00"
         },
         {
             "name": "phar-io/version",
@@ -347,8 +343,7 @@
                 "issues": "https://github.com/phar-io/version/issues",
                 "source": "https://github.com/phar-io/version/tree/3.2.1"
             },
-            "time": "2022-02-21T01:04:05+00:00",
-            "published-time": "2022-02-21T01:04:30+00:00"
+            "time": "2022-02-21T01:04:05+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -400,8 +395,7 @@
                 "issues": "https://github.com/php-stubs/wordpress-stubs/issues",
                 "source": "https://github.com/php-stubs/wordpress-stubs/tree/v7.1.2"
             },
-            "time": "2026-10-06T06:59:21+00:00",
-            "published-time": "2026-10-06T07:32:21+00:00"
+            "time": "2026-10-06T06:59:21+00:00"
         },
         {
             "name": "php-stubs/wordpress-tests-stubs",
@@ -441,8 +435,7 @@
                 "issues": "https://github.com/php-stubs/wordpress-tests-stubs/issues",
                 "source": "https://github.com/php-stubs/wordpress-tests-stubs/tree/v7.1.0"
             },
-            "time": "2026-08-20T07:25:45+00:00",
-            "published-time": "2026-08-20T07:26:08+00:00"
+            "time": "2026-08-20T07:25:45+00:00"
         },
         {
             "name": "phpcompatibility/php-compatibility",
@@ -504,8 +497,7 @@
                 "issues": "https://github.com/PHPCompatibility/PHPCompatibility/issues",
                 "source": "https://github.com/PHPCompatibility/PHPCompatibility"
             },
-            "time": "2019-12-27T09:44:58+00:00",
-            "published-time": "2019-12-27T10:11:56+00:00"
+            "time": "2019-12-27T09:44:58+00:00"
         },
         {
             "name": "phpcompatibility/phpcompatibility-paragonie",
@@ -581,8 +573,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-09-19T17:43:28+00:00",
-            "published-time": "2025-09-19T17:46:46+00:00"
+            "time": "2025-09-19T17:43:28+00:00"
         },
         {
             "name": "phpcompatibility/phpcompatibility-wp",
@@ -657,8 +648,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-10-18T00:05:59+00:00",
-            "published-time": "2025-10-18T00:08:18+00:00"
+            "time": "2025-10-18T00:05:59+00:00"
         },
         {
             "name": "phpcsstandards/phpcsextra",
@@ -740,8 +730,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-07-27T11:13:17+00:00",
-            "published-time": "2026-07-27T11:19:59+00:00"
+            "time": "2026-07-27T11:13:17+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -834,8 +823,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-07-27T10:28:41+00:00",
-            "published-time": "2026-07-27T10:36:31+00:00"
+            "time": "2026-07-27T10:28:41+00:00"
         },
         {
             "name": "phpstan/extension-installer",
@@ -883,16 +871,15 @@
                 "issues": "https://github.com/phpstan/extension-installer/issues",
                 "source": "https://github.com/phpstan/extension-installer/tree/1.4.3"
             },
-            "time": "2024-09-04T20:21:43+00:00",
-            "published-time": "2024-09-04T20:22:27+00:00"
+            "time": "2024-09-04T20:21:43+00:00"
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.3.5",
+            "version": "2.3.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/645a1bd6bead15fc1b8474137467961d0fa30a79",
-                "reference": "645a1bd6bead15fc1b8474137467961d0fa30a79",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/00cedebb76cc82c1592414fa4f616cefdccda16f",
+                "reference": "00cedebb76cc82c1592414fa4f616cefdccda16f",
                 "shasum": ""
             },
             "require": {
@@ -948,21 +935,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-03T12:14:22+00:00",
-            "published-time": "2026-11-03T12:14:36+00:00"
+            "time": "2026-11-15T19:58:26+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-phpunit.git",
-                "reference": "8d16b8478e523a47f8c02e83bce8981b5b5a3b03"
+                "reference": "ffff35d4f96c4642d7f41a3515d90afa0f58be62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/8d16b8478e523a47f8c02e83bce8981b5b5a3b03",
-                "reference": "8d16b8478e523a47f8c02e83bce8981b5b5a3b03",
+                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/ffff35d4f96c4642d7f41a3515d90afa0f58be62",
+                "reference": "ffff35d4f96c4642d7f41a3515d90afa0f58be62",
                 "shasum": ""
             },
             "require": {
@@ -1005,10 +991,9 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan-phpunit/issues",
-                "source": "https://github.com/phpstan/phpstan-phpunit/tree/2.1.1"
+                "source": "https://github.com/phpstan/phpstan-phpunit/tree/2.1.2"
             },
-            "time": "2026-10-06T18:12:32+00:00",
-            "published-time": "2026-10-07T04:59:27+00:00"
+            "time": "2026-11-12T15:27:53+00:00"
         },
         {
             "name": "sirbrillig/phpcs-variable-analysis",
@@ -1064,8 +1049,7 @@
                 "source": "https://github.com/sirbrillig/phpcs-variable-analysis",
                 "wiki": "https://github.com/sirbrillig/phpcs-variable-analysis/wiki"
             },
-            "time": "2025-09-30T22:22:48+00:00",
-            "published-time": "2025-09-30T22:24:41+00:00"
+            "time": "2025-09-30T22:22:48+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -1144,8 +1128,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-08-06T00:17:32+00:00",
-            "published-time": "2026-08-06T01:05:02+00:00"
+            "time": "2026-08-06T00:17:32+00:00"
         },
         {
             "name": "szepeviktor/phpstan-wordpress",
@@ -1208,8 +1191,7 @@
                 "issues": "https://github.com/szepeviktor/phpstan-wordpress/issues",
                 "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v2.0.4"
             },
-            "time": "2026-05-22T16:22:09+00:00",
-            "published-time": "2026-08-28T06:48:49+00:00"
+            "time": "2026-05-22T16:22:09+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -1275,8 +1257,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-07-27T11:53:23+00:00",
-            "published-time": "2026-07-27T11:55:52+00:00"
+            "time": "2026-07-27T11:53:23+00:00"
         }
     ],
     "packages-dev": [],
@@ -1294,5 +1275,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.11.0"
+    "plugin-api-version": "2.9.0"
 }
