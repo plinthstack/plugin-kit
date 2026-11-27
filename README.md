@@ -121,6 +121,28 @@ The npm package brings stylelint 17 and WordPress's stylelint config, with its S
 - A plugin that sets its own `ignoreFiles` replaces the kit's, so it lists `/**/build/**` and `/**/vendor/**` again, with the leading slash.
 - Stylelint stays on 17, the version `@wordpress/stylelint-config` requires.
 
+### Pre-commit checks
+
+The npm package brings lint-staged, husky and a lint-staged config. **It checks staged files and never rewrites them:**
+
+| Staged files | Check |
+|---|---|
+| `*.php` | `vendor/bin/phpcs`, with the plugin's `phpcs.xml` |
+| `*.js`, `*.jsx`, `*.mjs`, `*.cjs`, `*.ts`, `*.tsx` | ESLint, with no warnings allowed |
+| `*.css`, `*.scss` | Stylelint, then `prettier --check` on files outside `build/` and `vendor/` |
+
+A plugin's `.lintstagedrc.cjs` re-exports the config; the `.cjs` name loads whether or not its `package.json` sets `"type": "module"`:
+
+```js
+module.exports = require( '@plinthstack/plugin-kit/lint-staged' );
+```
+
+Its `package.json` sets `"prepare": "husky || true"` under `scripts`, and its `.husky/pre-commit` holds one line, `lint-staged`.
+
+- The hook starts working after the next plain `npm install`, which runs `prepare`.
+- `|| true` keeps an install without dev dependencies, such as `npm ci --omit=dev`, from failing on the missing `husky`.
+- Husky installs the hook only when the plugin folder is the git repository's root; inside a larger repo it installs nothing.
+
 ## Development
 
 ### Tests
@@ -139,15 +161,16 @@ Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to chec
 1. Prettier on the samples in `tests/prettier/`, with the kit's config and a plugin override, compared with each expected file.
 2. ESLint on the samples in `tests/eslint/`, with the kit's config and a plugin override, compared with each expected list of rule IDs, then on a plugin-shaped folder to check it skips `build/` and `vendor/`.
 3. Stylelint on the samples in `tests/stylelint/` the same way, then on Prettier-formatted stylesheets to check its fixes leave Prettier nothing to change.
+4. Lint-staged in a throwaway git repo, staging the PHPCS, ESLint, stylelint and Prettier samples to check which commits it blocks. It needs `composer install` first.
 
-All three suites run even when one fails.
+All four suites run even when one fails.
 
 ### CI
 
 | Job | Checks |
 |---|---|
 | `php` | `composer validate --strict`, then `composer test` |
-| `npm` | `npm ci`, `npm test`, then the npm tarball holds exactly the paths in the job's expected list |
+| `npm` | `composer install` (for the pre-commit test's PHPCS), `npm ci`, `npm test`, then the npm tarball holds exactly the paths in the job's expected list |
 | `actionlint` | `.github/workflows/`; run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12` |
 
 A new shared config goes in `package.json` `files` and `exports`, and, with every file path it packs, in the `npm` job's expected list.
