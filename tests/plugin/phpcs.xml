@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset name="PlinthStack Demo">
+	<file>.</file>
+	<exclude-pattern>*/build/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<arg name="basepath" value="."/>
+	<rule ref="vendor/plinthstack/plugin-kit/phpcs/ruleset.xml"/>
+	<config name="text_domain" value="plinthstack-demo"/>
+	<config name="testVersion" value="8.1-"/>
+</ruleset>

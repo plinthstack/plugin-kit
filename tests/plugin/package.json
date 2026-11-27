@@ -1,0 +1,13 @@
+{
+	"name": "plinthstack-demo",
+	"private": true,
+	"scripts": {
+		"build": "node build.js",
+		"lint:js": "eslint .",
+		"lint:css": "stylelint \"src/**/*.css\"",
+		"test:js": "node --test \"src/**/*.test.js\""
+	},
+	"devDependencies": {
+		"@plinthstack/plugin-kit": "file:../.."
+	}
+}

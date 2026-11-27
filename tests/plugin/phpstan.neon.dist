@@ -1,0 +1,6 @@
+includes:
+	- vendor/plinthstack/plugin-kit/phpstan/base.neon
+
+parameters:
+	paths:
+		- plinthstack-demo.php

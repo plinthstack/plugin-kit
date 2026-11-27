@@ -10,3 +10,5 @@ parameters:
 		# Sample plugins with planted errors; tests/fixtures.sh checks them.
 		- tests/phpcs
 		- tests/phpstan
+		# Checked by its own config when CI runs static.yml on it.
+		- tests/plugin

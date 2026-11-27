@@ -48,6 +48,13 @@ jobs:
           packed=$(npm pack --dry-run --json --ignore-scripts | jq -r '.[0].files[].path' | LC_ALL=C sort)
           diff <(printf '%s\n' LICENSE README.md eslint.config.js lint-staged.config.js package.json prettier.config.js stylelint.config.js | LC_ALL=C sort) <(echo "$packed")
 
+  static:
+    name: static
+    uses: ./.github/workflows/static.yml
+    with:
+      working-directory: tests/plugin
+      js-tests: true
+
   actionlint:
     name: actionlint
     runs-on: ubuntu-latest
