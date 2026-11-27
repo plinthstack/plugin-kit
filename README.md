@@ -105,6 +105,21 @@ export default [ ...kit, { rules: { 'no-console': 'off' } } ];
 - It skips `build/` and `vendor/` folders at any depth.
 - ESLint stays on 9 until the plugins inside `@wordpress/eslint-plugin` accept 10; with 10, npm installs a second ESLint and plugins still run 9.
 
+### Stylelint
+
+The npm package brings stylelint 17 and WordPress's stylelint config, with its SCSS rules for `.scss` files. A plugin's `.stylelintrc.json` extends it, then adds its own rules:
+
+```json
+{
+	"extends": "@plinthstack/plugin-kit/stylelint",
+	"rules": { "color-named": null }
+}
+```
+
+- `stylelint --fix` output passes the kit's Prettier check, so the two never undo each other.
+- It skips `build/` and `vendor/` folders at any depth, counted from the folder stylelint runs in. Run it from the plugin root.
+- Stylelint stays on 17, the version `@wordpress/stylelint-config` requires.
+
 ## Development
 
 ### Tests
@@ -122,8 +137,9 @@ Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to chec
 
 1. Prettier on the samples in `tests/prettier/`, with the kit's config and a plugin override, compared with each expected file.
 2. ESLint on the samples in `tests/eslint/`, with the kit's config and a plugin override, compared with each expected list of rule IDs, then on a plugin-shaped folder to check it skips `build/` and `vendor/`.
+3. Stylelint on the samples in `tests/stylelint/` the same way, then on Prettier-formatted stylesheets to check its fixes leave Prettier nothing to change.
 
-Both suites run even when the first fails.
+All three suites run even when one fails.
 
 ### CI
 
@@ -139,4 +155,4 @@ A new shared config goes in `package.json` `files` and `exports`, and, with ever
 
 - Dependabot checks the Composer, npm and GitHub Actions dependencies weekly and opens a PR per update.
 - The actionlint image is bumped by hand, since Dependabot skips `docker://` references.
-- Dependabot skips ESLint major versions; see ESLint above.
+- Dependabot skips ESLint and stylelint major versions; see ESLint and Stylelint above.

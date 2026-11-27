@@ -1,0 +1,6 @@
+.plinthstack-demo {
+	@include plinthstack-demo-missing;
+	& .plinthstack-demo-item {
+		color: white;
+	}
+}
