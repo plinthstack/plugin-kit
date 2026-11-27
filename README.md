@@ -3,7 +3,7 @@ Shared tooling and scaffold for PlinthStack WordPress plugins
 
 ## Requirements
 
-- PHP 8.1 or later, and Node 22.13 or later for the npm package.
+- PHP 8.1 or later, and Node 22.22.2+ or 24.15+ for the npm package.
 - The kit brings PHPCS, PHPStan and their extensions, so a plugin requires none of them itself (PHPCompatibility 10 is an opt-in; see PHPCS below). Its `composer.json` needs this `config`:
 
   ```json

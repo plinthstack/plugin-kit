@@ -16,7 +16,7 @@
 		"./stylelint": "./stylelint.config.js"
 	},
 	"engines": {
-		"node": ">=22.13.0"
+		"node": "^22.22.2 || >=24.15.0"
 	},
 	"homepage": "https://github.com/plinthstack/plugin-kit",
 	"bugs": "https://github.com/plinthstack/plugin-kit/issues",
