@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: |
           packed=$(npm pack --dry-run --json --ignore-scripts | jq -r '.[0].files[].path' | LC_ALL=C sort)
-          diff <(printf '%s\n' LICENSE README.md package.json prettier.config.js | LC_ALL=C sort) <(echo "$packed")
+          diff <(printf '%s\n' LICENSE README.md eslint.config.js package.json prettier.config.js | LC_ALL=C sort) <(echo "$packed")
 
   actionlint:
     name: actionlint
