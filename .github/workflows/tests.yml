@@ -1,0 +1,196 @@
+name: Tests
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: The plugin's folder in the repository.
+        type: string
+        default: .
+      full:
+        description: Add the other two corners of the range and WordPress trunk.
+        type: boolean
+        default: false
+      multisite:
+        description: Add a multisite row on the latest WordPress and PHP.
+        type: boolean
+        default: true
+      include:
+        description: 'JSON array of extra rows, such as [{"wp": "6.8", "php": "8.3"}]; "floor" and "latest" are allowed.'
+        type: string
+        default: '[]'
+      exclude:
+        description: JSON array of rows to drop, in the same form as include.
+        type: string
+        default: '[]'
+      node-version:
+        description: Node version; defaults to the plugin's .nvmrc.
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: Resolve versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      php: ${{ steps.kit.outputs.php }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Read plugin-kit.json
+        id: kit
+        run: |
+          jq -r 'if .requires_wp and .requires_php then "wp=\(.requires_wp)", "php=\(.requires_php)"
+            else error("plugin-kit.json needs requires_wp and requires_php") end' plugin-kit.json >>"$GITHUB_OUTPUT"
+
+      - name: Look up the latest WordPress and PHP
+        id: latest
+        env:
+          FLOOR_WP: ${{ steps.kit.outputs.wp }}
+          FLOOR_PHP: ${{ steps.kit.outputs.php }}
+        run: |
+          fetch() { curl -fsS --retry 3 --retry-all-errors "$@"; }
+          wp=$(fetch https://api.wordpress.org/core/version-check/1.7/ | jq -r '.offers[0].current')
+          # The floor runs its newest point release, which is what sites on that branch run.
+          floor=$(fetch https://api.wordpress.org/core/stable-check/1.0/ | jq -r --arg wp "$FLOOR_WP" \
+            '[keys[] | select(. == $wp or startswith($wp + "."))] | max_by(split(".") | map(tonumber)) // empty')
+          # The highest numeric major; php.net also lists "3" with a non-numeric version.
+          php=$(fetch 'https://www.php.net/releases/?json' \
+            | jq -r '[to_entries[] | select(.key | test("^[0-9]+$"))] | max_by(.key | tonumber) | .value.version' \
+            | cut -d. -f1,2)
+          version='^[0-9]+\.[0-9]+(\.[0-9]+)?$'
+          if ! [[ "$wp" =~ $version && "$floor" =~ $version && "$php" =~ ^[0-9]+\.[0-9]+$ && "$FLOOR_PHP" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Could not resolve versions: WordPress '$wp', floor '$floor' from requires_wp '$FLOOR_WP', PHP '$php', requires_php '$FLOOR_PHP'"
+            exit 1
+          fi
+          # A new PHP can ship before the wordpress images wp-env builds on; step back a minor, or to the
+          # previous major's newest, until both tags exist. Only a 404 means missing; other failures stop the job.
+          image() {
+            local code
+            code=$(curl -sS --retry 3 -o /dev/null -w '%{http_code}' "https://hub.docker.com/v2/repositories/library/wordpress/tags/$1") || return 2
+            case $code in 200) return 0 ;; 404) return 1 ;; *) echo "::error::Docker Hub answered $code for wordpress:$1"; return 2 ;; esac
+          }
+          for _ in 1 2 3 4 5; do
+            status=0
+            image "php$php" && image "cli-php$php" || status=$?
+            [ "$status" -eq 0 ] && break
+            [ "$status" -eq 1 ] || exit 1
+            echo "::notice::No wordpress image for PHP $php yet; using the previous release"
+            if [ "${php#*.}" -gt 0 ]; then
+              php="${php%.*}.$(( ${php#*.} - 1 ))"
+            else
+              php=$(fetch "https://www.php.net/releases/?json&version=$(( ${php%.*} - 1 ))" | jq -r '.version' | cut -d. -f1,2)
+              [[ "$php" =~ ^[0-9]+\.[0-9]+$ ]] || break
+            fi
+          done
+          [ "$status" -eq 0 ] || { echo "::error::Could not find a PHP release with wordpress images"; exit 1; }
+          printf 'wp=%s\nfloor=%s\nphp=%s\n' "$wp" "$floor" "$php" >>"$GITHUB_OUTPUT"
+
+      - name: Build the matrix
+        id: matrix
+        env:
+          FLOOR_WP: ${{ steps.latest.outputs.floor }}
+          FLOOR_PHP: ${{ steps.kit.outputs.php }}
+          LATEST_WP: ${{ steps.latest.outputs.wp }}
+          LATEST_PHP: ${{ steps.latest.outputs.php }}
+          FULL: ${{ inputs.full }}
+          MULTISITE: ${{ inputs.multisite }}
+          INCLUDE: ${{ inputs.include }}
+          EXCLUDE: ${{ inputs.exclude }}
+        run: |
+          matrix=$(jq -cn --argjson include "$INCLUDE" --argjson exclude "$EXCLUDE" '
+            def v($value; $floor; $latest): if $value == "floor" then $floor elif $value == "latest" then $latest else $value end;
+            def row($wp; $php; $multisite; $experimental):
+              { wp: $wp, php: $php, multisite: $multisite, experimental: $experimental,
+                label: "WP \($wp) / PHP \($php)\(if $multisite then " / multisite" else "" end)" };
+            def resolved: [ .[] | v(.wp; env.FLOOR_WP; env.LATEST_WP) as $wp | row($wp; v(.php; env.FLOOR_PHP; env.LATEST_PHP); .multisite // false; $wp == "trunk") ];
+            ( [ row(env.FLOOR_WP; env.FLOOR_PHP; false; false), row(env.LATEST_WP; env.LATEST_PHP; false; false) ]
+              + if env.MULTISITE == "true" then [ row(env.LATEST_WP; env.LATEST_PHP; true; false) ] else [] end
+              + if env.FULL == "true" then [ row(env.FLOOR_WP; env.LATEST_PHP; false; false), row(env.LATEST_WP; env.FLOOR_PHP; false; false), row("trunk"; env.LATEST_PHP; false; true) ] else [] end
+              + ( $include | resolved )
+            ) as $rows
+            | ( $exclude | resolved ) as $drop
+            | [ $rows[] | select( . as $r | $drop | any( .wp == $r.wp and .php == $r.php and .multisite == $r.multisite ) | not ) ]
+            | unique_by( [ .wp, .php, .multisite ] )
+            | if length == 0 then error("every row is excluded") else { include: . } end')
+          echo "matrix=$matrix" >>"$GITHUB_OUTPUT"
+
+  test:
+    name: ${{ matrix.label }}
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.resolve.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Composer installs on the runner with the floor PHP; WordPress runs the row's PHP in wp-env.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ needs.resolve.outputs.php }}
+          coverage: none
+
+      - uses: ramsey/composer-install@v4
+        with:
+          working-directory: ${{ inputs.working-directory }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+          node-version-file: ${{ !inputs.node-version && format('{0}/.nvmrc', inputs.working-directory) || '' }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      - run: npm ci
+
+      # Trunk may fail: its steps fail without failing the job, so the Result job still passes.
+      - name: Start WordPress
+        continue-on-error: ${{ matrix.experimental }}
+        env:
+          # The mirror has no trunk branch; its default branch is master.
+          WP_ENV_CORE: WordPress/WordPress#${{ matrix.wp == 'trunk' && 'master' || matrix.wp }}
+          WP_ENV_PHP_VERSION: ${{ matrix.php }}
+        run: npm run wp-env start
+
+      - name: Run PHP unit tests
+        continue-on-error: ${{ matrix.experimental }}
+        run: npm run ${{ matrix.multisite && 'test:php:multisite' || 'test:php' }}
+
+  # Matrix job names change with each WordPress and PHP release, so a branch rule requires this one instead.
+  result:
+    name: Result
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check every row passed
+        env:
+          RESULT: ${{ needs.test.result }}
+        run: |
+          if [ "$RESULT" != success ]; then
+            echo "::error::A test row ended with '$RESULT'"
+            exit 1
+          fi

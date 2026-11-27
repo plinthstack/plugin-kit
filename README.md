@@ -4,7 +4,7 @@ Shared tooling and scaffold for PlinthStack WordPress plugins
 ## Requirements
 
 - PHP 8.1 or later, and Node 22.22.2+ or 24.15+ for the npm package.
-- The kit brings PHPCS, PHPStan and their extensions, so a plugin requires none of them itself (PHPCompatibility 10 is an opt-in; see PHPCS below). Its `composer.json` needs this `config`:
+- The kit brings PHPCS, PHPStan, PHPUnit 9 with the Yoast polyfills, and their extensions, so a plugin requires none of them itself (PHPCompatibility 10 is an opt-in; see PHPCS below). Its `composer.json` needs this `config`:
 
   ```json
   "config": {
@@ -173,6 +173,43 @@ jobs:
 | `js` | `true` | `false` skips every npm step |
 | `js-tests` | `false` | `true` runs `npm run test:js` |
 
+### Tests workflow
+
+A plugin's CI calls the reusable workflow, and its release workflow adds `full: true`:
+
+```yaml
+jobs:
+  tests:
+    uses: plinthstack/plugin-kit/.github/workflows/tests.yml@v1
+```
+
+Each row starts WordPress with `npm run wp-env start`, then runs `npm run test:php`, or `npm run test:php:multisite` on a multisite row. The npm package brings `@wordpress/env`.
+
+| Rows | When |
+|---|---|
+| The newest point release of `requires_wp`, with `requires_php` | Always |
+| Latest WordPress with latest PHP | Always |
+| Latest WordPress with latest PHP, multisite | Unless `multisite: false` |
+| `requires_wp` with latest PHP, latest WordPress with `requires_php` | With `full: true` |
+| WordPress trunk with latest PHP, allowed to fail | With `full: true` |
+
+Versions come from api.wordpress.org and php.net when the job runs; a PHP release without wordpress Docker images yet falls back to the previous minor. Row names change with them, so a branch rule requires the `tests / Result` check, which fails when any row but trunk fails.
+
+| Input | Default | Purpose |
+|---|---|---|
+| `working-directory` | `.` | The plugin's folder in the repository |
+| `full` | `false` | Adds the `full: true` rows above |
+| `multisite` | `true` | `false` drops the multisite row |
+| `include` | `[]` | Extra rows as JSON, such as `[{"wp": "6.8", "php": "8.3", "multisite": true}]`; `floor` and `latest` work as versions |
+| `exclude` | `[]` | Rows to drop, in the same form |
+| `node-version` | the plugin's `.nvmrc` | Node version for the job |
+
+**Every plugin with wp-env needs this override in its `package.json`**, or `npm audit --audit-level=high` in the static workflow fails. wp-env's Playground dependency pins `isomorphic-git` 1.37.6, which has a high-severity advisory:
+
+```json
+"overrides": { "isomorphic-git": "^1.38.6" }
+```
+
 ## Development
 
 ### Tests
@@ -192,9 +229,10 @@ Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to chec
 2. ESLint on the samples in `tests/eslint/`, with the kit's config and a plugin override, compared with each expected list of rule IDs, then on a plugin-shaped folder to check it skips `build/` and `vendor/`.
 3. Stylelint on the samples in `tests/stylelint/` the same way, then on Prettier-formatted stylesheets to check its fixes leave Prettier nothing to change.
 4. Lint-staged in a throwaway git repo, staging the PHPCS, ESLint, stylelint and Prettier samples to check which commits it blocks. It needs `composer install` first.
-5. The static workflow's `plugin-kit.json` and version steps, on copies of `tests/plugin` with versions changed or lines removed. It needs the Go `yq` (mikefarah/yq) v4, not the Python one.
+5. The static workflow's `plugin-kit.json` and version steps, on copies of `tests/plugin` with versions changed or lines removed.
+6. The tests workflow's matrix step, with fixed versions and each input.
 
-All five suites run even when one fails.
+Suites 5 and 6 need the Go `yq` (mikefarah/yq) v4, not the Python one. All six suites run even when one fails.
 
 ### CI
 
@@ -203,14 +241,15 @@ All five suites run even when one fails.
 | `php` | `composer validate --strict`, then `composer test` |
 | `npm` | `composer install` (for the pre-commit test's PHPCS), `npm ci`, `npm test`, then the npm tarball holds exactly the paths in the job's expected list |
 | `static` | `static.yml` on the sample plugin in `tests/plugin`, with `js-tests` on |
+| `tests` | `tests.yml` on the sample plugin, with the default rows |
 | `actionlint` | `.github/workflows/`; run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12` |
 
 A new shared config goes in `package.json` `files` and `exports`, and, with every file path it packs, in the `npm` job's expected list.
 
-`tests/plugin` installs a copy of the kit (`install-links=true`), so its `package-lock.json` keeps the kit's dependency versions from when it was last written. Run `npm install` in `tests/plugin` when the kit's npm dependencies change, and `npm audit fix` there when the `static` job's npm audit fails.
+`tests/plugin` installs a copy of the kit (`install-links=true`), so its `package-lock.json` keeps the kit's dependency versions from when it was last written. When the kit's npm dependencies change, delete `tests/plugin/package-lock.json` and `tests/plugin/node_modules`, then run `npm install` there; a plain `npm install` keeps the old lock. When the `static` job's npm audit fails, run `npm audit fix` there.
 
 ### Dependencies
 
 - Dependabot checks the Composer, npm and GitHub Actions dependencies weekly and opens a PR per update.
 - The actionlint image is bumped by hand, since Dependabot skips `docker://` references.
-- Dependabot skips ESLint, stylelint and stylelint-scss major versions; see ESLint and Stylelint above.
+- Dependabot skips major versions of ESLint, stylelint and stylelint-scss (see ESLint and Stylelint above) and of PHPUnit, which the WordPress test library needs at 9.

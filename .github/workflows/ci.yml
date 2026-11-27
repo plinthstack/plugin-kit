@@ -55,6 +55,12 @@ jobs:
       working-directory: tests/plugin
       js-tests: true
 
+  tests:
+    name: tests
+    uses: ./.github/workflows/tests.yml
+    with:
+      working-directory: tests/plugin
+
   actionlint:
     name: actionlint
     runs-on: ubuntu-latest

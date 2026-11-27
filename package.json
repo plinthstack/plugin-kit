@@ -27,6 +27,7 @@
 		"url": "git+https://github.com/plinthstack/plugin-kit.git"
 	},
 	"dependencies": {
+		"@wordpress/env": "^12.2.0",
 		"@wordpress/eslint-plugin": "^28.2.0",
 		"@wordpress/prettier-config": "^5.0.0",
 		"@wordpress/stylelint-config": "^27.2.0",
@@ -38,6 +39,9 @@
 		"stylelint-scss": "^7.5.0"
 	},
 	"scripts": {
-		"test": "s=0; for t in prettier eslint stylelint lint-staged static; do tests/$t.sh || s=1; done; exit $s"
+		"test": "s=0; for t in prettier eslint stylelint lint-staged static matrix; do tests/$t.sh || s=1; done; exit $s"
+	},
+	"overrides": {
+		"isomorphic-git": "^1.38.6"
 	}
 }

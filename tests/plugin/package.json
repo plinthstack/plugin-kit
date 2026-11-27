@@ -5,9 +5,15 @@
 		"build": "node build.js",
 		"lint:js": "eslint .",
 		"lint:css": "stylelint \"src/**/*.css\"",
-		"test:js": "node --test \"src/**/*.test.js\""
+		"test:js": "node --test \"src/**/*.test.js\"",
+		"wp-env": "wp-env",
+		"test:php": "wp-env run cli --env-cwd=wp-content/plugins/$(basename \"$PWD\") vendor/bin/phpunit",
+		"test:php:multisite": "wp-env run cli --env-cwd=wp-content/plugins/$(basename \"$PWD\") env WP_MULTISITE=1 vendor/bin/phpunit"
 	},
 	"devDependencies": {
 		"@plinthstack/plugin-kit": "file:../.."
+	},
+	"overrides": {
+		"isomorphic-git": "^1.38.6"
 	}
 }
