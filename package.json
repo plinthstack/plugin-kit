@@ -38,6 +38,6 @@
 		"stylelint-scss": "^7.5.0"
 	},
 	"scripts": {
-		"test": "s=0; for t in prettier eslint stylelint lint-staged; do tests/$t.sh || s=1; done; exit $s"
+		"test": "s=0; for t in prettier eslint stylelint lint-staged static; do tests/$t.sh || s=1; done; exit $s"
 	}
 }

@@ -143,6 +143,36 @@ Its `package.json` sets `"prepare": "husky || true"` under `scripts`, and its `.
 - `|| true` keeps an install without dev dependencies, such as `npm ci --omit=dev`, from failing on the missing `husky`.
 - Husky installs the hook only when the plugin folder is the git repository's root; inside a larger repo it installs nothing.
 
+### Static checks workflow
+
+A plugin's CI calls the reusable workflow:
+
+```yaml
+jobs:
+  static:
+    uses: plinthstack/plugin-kit/.github/workflows/static.yml@v1
+    with:
+      js-tests: true
+```
+
+`@v1` exists from the kit's first release; until then, use `@main`. The job runs, in order:
+
+1. Reads `slug`, `prefix` and `requires_php` from `plugin-kit.json`.
+2. Validates `plugin-kit.json` with `plugin-kit validate`, after `composer install`.
+3. Fails unless the `Version` header in `<slug>.php`, its `define( '<PREFIX>_VERSION', '…' );` and `readme.txt`'s `Stable tag` agree.
+4. `composer run lint`, `composer run analyze`, then `composer audit`.
+5. `npm ci`, `npm run lint:js`, `npm run lint:css`, `npm run test:js` (only with `js-tests: true`), `npm run build`, then `npm audit --audit-level=high`.
+
+**The plugin defines those composer and npm scripts**, so it keeps its own build entry points.
+
+| Input | Default | Purpose |
+|---|---|---|
+| `working-directory` | `.` | The plugin's folder in the repository |
+| `php-version` | `requires_php` | PHP version for the job |
+| `node-version` | the plugin's `.nvmrc` | Node version for the job |
+| `js` | `true` | `false` skips every npm step |
+| `js-tests` | `false` | `true` runs `npm run test:js` |
+
 ## Development
 
 ### Tests
@@ -162,8 +192,9 @@ Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to chec
 2. ESLint on the samples in `tests/eslint/`, with the kit's config and a plugin override, compared with each expected list of rule IDs, then on a plugin-shaped folder to check it skips `build/` and `vendor/`.
 3. Stylelint on the samples in `tests/stylelint/` the same way, then on Prettier-formatted stylesheets to check its fixes leave Prettier nothing to change.
 4. Lint-staged in a throwaway git repo, staging the PHPCS, ESLint, stylelint and Prettier samples to check which commits it blocks. It needs `composer install` first.
+5. The static workflow's `plugin-kit.json` and version steps, on copies of `tests/plugin` with versions changed or lines removed. It needs the Go `yq` (mikefarah/yq) v4, not the Python one.
 
-All four suites run even when one fails.
+All five suites run even when one fails.
 
 ### CI
 
@@ -171,9 +202,12 @@ All four suites run even when one fails.
 |---|---|
 | `php` | `composer validate --strict`, then `composer test` |
 | `npm` | `composer install` (for the pre-commit test's PHPCS), `npm ci`, `npm test`, then the npm tarball holds exactly the paths in the job's expected list |
+| `static` | `static.yml` on the sample plugin in `tests/plugin`, with `js-tests` on |
 | `actionlint` | `.github/workflows/`; run it locally with `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:1.7.12` |
 
 A new shared config goes in `package.json` `files` and `exports`, and, with every file path it packs, in the `npm` job's expected list.
+
+`tests/plugin` installs a copy of the kit (`install-links=true`), so its `package-lock.json` keeps the kit's dependency versions from when it was last written. Run `npm install` in `tests/plugin` when the kit's npm dependencies change, and `npm audit fix` there when the `static` job's npm audit fails.
 
 ### Dependencies
 

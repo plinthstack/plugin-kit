@@ -5,6 +5,8 @@
 	<!-- Sample plugins with planted violations; tests/fixtures.sh checks them. -->
 	<exclude-pattern>*/tests/phpcs/*</exclude-pattern>
 	<exclude-pattern>*/tests/phpstan/*</exclude-pattern>
+	<!-- Checked by its own config when CI runs static.yml on it. -->
+	<exclude-pattern>*/tests/plugin/*</exclude-pattern>
 	<arg name="basepath" value="."/>
 
 	<rule ref="./phpcs/ruleset.xml"/>

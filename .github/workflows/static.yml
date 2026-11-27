@@ -1,0 +1,121 @@
+name: Static checks
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: The plugin's folder in the repository.
+        type: string
+        default: .
+      php-version:
+        description: PHP version; defaults to requires_php in plugin-kit.json.
+        type: string
+        default: ''
+      node-version:
+        description: Node version; defaults to the plugin's .nvmrc.
+        type: string
+        default: ''
+      js:
+        description: Run the npm install, lint, build and audit steps.
+        type: boolean
+        default: true
+      js-tests:
+        description: Run npm run test:js.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Lint, analyse and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Read plugin-kit.json
+        id: kit
+        run: |
+          jq -r 'if .slug and .prefix and .requires_php then "slug=\(.slug)", "prefix=\(.prefix)", "php=\(.requires_php)"
+            else error("plugin-kit.json needs slug, prefix and requires_php") end' plugin-kit.json >>"$GITHUB_OUTPUT"
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version || steps.kit.outputs.php }}
+          coverage: none
+
+      - uses: ramsey/composer-install@v4
+        with:
+          working-directory: ${{ inputs.working-directory }}
+
+      - name: Validate plugin-kit.json
+        run: composer exec plugin-kit -- validate
+
+      - name: Check versions agree
+        env:
+          SLUG: ${{ steps.kit.outputs.slug }}
+          PREFIX: ${{ steps.kit.outputs.prefix }}
+        run: |
+          constant=$(tr '[:lower:]' '[:upper:]' <<<"${PREFIX}_VERSION")
+          # WordPress and wordpress.org trim these values and read the first match, so trailing space or CRLF is not a mismatch.
+          first() { sed -n "$1" "$2" | sed -n 1p; }
+          for file in "$SLUG.php" readme.txt; do
+            [ -f "$file" ] || { echo "::error::$file not found"; exit 1; }
+          done
+          header=$(first 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p' "$SLUG.php")
+          defined=$(first "s/^[[:space:]]*define([[:space:]]*'$constant',[[:space:]]*'\([^']*\)'[[:space:]]*);.*$/\1/p" "$SLUG.php")
+          stable=$(first 's/^Stable tag:[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p' readme.txt)
+          # A renamed line extracts as empty, and three empty strings agree.
+          if [ -z "$header" ] || [ "$header" != "$defined" ] || [ "$header" != "$stable" ]; then
+            echo "::error::Version mismatch: $SLUG.php header '$header', $constant '$defined', readme.txt Stable tag '$stable'"
+            exit 1
+          fi
+
+      - name: Lint PHP
+        run: composer run lint
+
+      - name: Analyse PHP
+        run: composer run analyze
+
+      - name: Audit Composer dependencies
+        run: composer audit
+
+      - if: inputs.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+          node-version-file: ${{ !inputs.node-version && format('{0}/.nvmrc', inputs.working-directory) || '' }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      - if: inputs.js
+        run: npm ci
+
+      - name: Lint JavaScript
+        if: inputs.js
+        run: npm run lint:js
+
+      - name: Lint styles
+        if: inputs.js
+        run: npm run lint:css
+
+      - name: Run JavaScript unit tests
+        if: inputs.js && inputs.js-tests
+        run: npm run test:js
+
+      - name: Build
+        if: inputs.js
+        run: npm run build
+
+      - name: Audit npm dependencies
+        if: inputs.js
+        run: npm audit --audit-level=high

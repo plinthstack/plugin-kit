@@ -1,0 +1,21 @@
+{
+	"name": "plinthstack/plinthstack-demo",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"repositories": [
+		{ "type": "path", "url": "../.." }
+	],
+	"require-dev": {
+		"plinthstack/plugin-kit": "@dev"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
+		}
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"analyze": "phpstan analyse --memory-limit=1G"
+	}
+}
