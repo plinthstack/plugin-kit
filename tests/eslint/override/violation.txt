@@ -1,0 +1,3 @@
+eqeqeq
+no-unused-vars
+prettier/prettier

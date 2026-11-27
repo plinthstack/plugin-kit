@@ -77,6 +77,8 @@ The npm package brings Prettier (the `wp-prettier` fork, as `@wordpress/scripts`
 module.exports = require( '@plinthstack/plugin-kit/prettier' );
 ```
 
+In a plugin whose `package.json` sets `"type": "module"`, name the file `.prettierrc.cjs`, or Prettier and ESLint stop with `module is not defined in ES module scope`.
+
 If the plugin lists its own `prettier`, alias it to `wp-prettier` with the same range as the kit's `prettier` dependency. Otherwise npm dedupes the kit's fork onto upstream Prettier, which warns `Ignored unknown option { parenSpacing: … }` and formats without paren spacing.
 
 To change an option, spread the kit's config first. A plugin that sets its own `overrides` spreads the kit's `overrides` into it too, or stylesheets lose their settings:
@@ -87,6 +89,21 @@ module.exports = {
 	printWidth: 100,
 };
 ```
+
+### ESLint
+
+The npm package brings ESLint 9 and WordPress's recommended flat config. A plugin's `eslint.config.mjs` spreads it, then adds its own rules:
+
+```js
+import kit from '@plinthstack/plugin-kit/eslint';
+
+export default [ ...kit, { rules: { 'no-console': 'off' } } ];
+```
+
+- It runs Prettier as the `prettier/prettier` rule and turns off the style rules Prettier owns.
+- That rule reads the Prettier config once, from the folder ESLint runs in, so Prettier `overrides` for JS files do not reach it. Run ESLint from the plugin root.
+- It skips `build/` and `vendor/` folders at any depth.
+- ESLint stays on 9 until the plugins inside `@wordpress/eslint-plugin` accept 10; with 10, npm installs a second ESLint and plugins still run 9.
 
 ## Development
 
@@ -101,7 +118,12 @@ module.exports = {
 
 Run `vendor/bin/phpcs` or `vendor/bin/phpstan analyse --memory-limit=1G` to check the kit alone.
 
-`npm test` formats the samples in `tests/prettier/` with the kit's config and with a plugin override, and compares each result with its expected file.
+`npm test` runs, in order:
+
+1. Prettier on the samples in `tests/prettier/`, with the kit's config and a plugin override, compared with each expected file.
+2. ESLint on the samples in `tests/eslint/`, with the kit's config and a plugin override, compared with each expected list of rule IDs, then on a plugin-shaped folder to check it skips `build/` and `vendor/`.
+
+Both suites run even when the first fails.
 
 ### CI
 
@@ -117,3 +139,4 @@ A new shared config goes in `package.json` `files` and `exports`, and, with ever
 
 - Dependabot checks the Composer, npm and GitHub Actions dependencies weekly and opens a PR per update.
 - The actionlint image is bumped by hand, since Dependabot skips `docker://` references.
+- Dependabot skips ESLint major versions; see ESLint above.

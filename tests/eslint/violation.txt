@@ -1,0 +1,4 @@
+eqeqeq
+no-console
+no-unused-vars
+prettier/prettier
