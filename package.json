@@ -7,11 +7,13 @@
 		"LICENSE",
 		"README.md",
 		"eslint.config.js",
+		"lint-staged.config.js",
 		"prettier.config.js",
 		"stylelint.config.js"
 	],
 	"exports": {
 		"./eslint": "./eslint.config.js",
+		"./lint-staged": "./lint-staged.config.js",
 		"./prettier": "./prettier.config.js",
 		"./stylelint": "./stylelint.config.js"
 	},
@@ -29,11 +31,13 @@
 		"@wordpress/prettier-config": "^5.0.0",
 		"@wordpress/stylelint-config": "^27.2.0",
 		"eslint": "^9.39.5",
+		"husky": "^9.1.7",
+		"lint-staged": "^17.6.2",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"stylelint": "^17.16.0",
 		"stylelint-scss": "^7.5.0"
 	},
 	"scripts": {
-		"test": "tests/prettier.sh; p=$?; tests/eslint.sh; e=$?; tests/stylelint.sh && exit $((p || e))"
+		"test": "s=0; for t in prettier eslint stylelint lint-staged; do tests/$t.sh || s=1; done; exit $s"
 	}
 }
