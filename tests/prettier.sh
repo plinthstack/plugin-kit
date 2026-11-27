@@ -23,6 +23,6 @@ node -e "
 	const c = require( './prettier.config.js' );
 	process.exit( c.parenSpacing === true && c.overrides.length > 0 && c.overrides.every( ( o ) => o.options.parenSpacing === false ) ? 0 : 1 );
 "
-report "prettier sets parenSpacing explicitly" $?
+report "prettier sets parenSpacing itself, not through @wordpress/prettier-config" $?
 
 finish

@@ -1,5 +1,3 @@
-const { join } = require( 'node:path' );
-
 module.exports = {
 	extends: [ '@wordpress/stylelint-config' ],
 	overrides: [
@@ -8,6 +6,6 @@ module.exports = {
 			extends: [ '@wordpress/stylelint-config/scss' ],
 		},
 	],
-	// Relative patterns would resolve against this file's folder inside node_modules, not the plugin.
-	ignoreFiles: [ '**/build/**', '**/vendor/**' ].map( ( glob ) => join( process.cwd(), glob ) ),
+	// Absolute, so stylelint does not resolve them against this file's folder inside node_modules.
+	ignoreFiles: [ '/**/build/**', '/**/vendor/**' ],
 };

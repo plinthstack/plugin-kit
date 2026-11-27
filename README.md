@@ -117,7 +117,8 @@ The npm package brings stylelint 17 and WordPress's stylelint config, with its S
 ```
 
 - `stylelint --fix` output passes the kit's Prettier check, so the two never undo each other.
-- It skips `build/` and `vendor/` folders at any depth, counted from the folder stylelint runs in. Run it from the plugin root.
+- It skips `build/` and `vendor/` folders at any depth, so a plugin inside a folder named `build` or `vendor` is skipped entirely.
+- A plugin that sets its own `ignoreFiles` replaces the kit's, so it lists `/**/build/**` and `/**/vendor/**` again, with the leading slash.
 - Stylelint stays on 17, the version `@wordpress/stylelint-config` requires.
 
 ## Development
@@ -155,4 +156,4 @@ A new shared config goes in `package.json` `files` and `exports`, and, with ever
 
 - Dependabot checks the Composer, npm and GitHub Actions dependencies weekly and opens a PR per update.
 - The actionlint image is bumped by hand, since Dependabot skips `docker://` references.
-- Dependabot skips ESLint and stylelint major versions; see ESLint and Stylelint above.
+- Dependabot skips ESLint, stylelint and stylelint-scss major versions; see ESLint and Stylelint above.
