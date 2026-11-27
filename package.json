@@ -7,14 +7,16 @@
 		"LICENSE",
 		"README.md",
 		"eslint.config.js",
-		"prettier.config.js"
+		"prettier.config.js",
+		"stylelint.config.js"
 	],
 	"exports": {
 		"./eslint": "./eslint.config.js",
-		"./prettier": "./prettier.config.js"
+		"./prettier": "./prettier.config.js",
+		"./stylelint": "./stylelint.config.js"
 	},
 	"engines": {
-		"node": ">=22.13.0"
+		"node": "^22.22.2 || >=24.15.0"
 	},
 	"homepage": "https://github.com/plinthstack/plugin-kit",
 	"bugs": "https://github.com/plinthstack/plugin-kit/issues",
@@ -25,10 +27,13 @@
 	"dependencies": {
 		"@wordpress/eslint-plugin": "^28.2.0",
 		"@wordpress/prettier-config": "^5.0.0",
+		"@wordpress/stylelint-config": "^27.2.0",
 		"eslint": "^9.39.5",
-		"prettier": "npm:wp-prettier@^3.9.6"
+		"prettier": "npm:wp-prettier@^3.9.6",
+		"stylelint": "^17.16.0",
+		"stylelint-scss": "^7.5.0"
 	},
 	"scripts": {
-		"test": "tests/prettier.sh; p=$?; tests/eslint.sh && exit $p"
+		"test": "tests/prettier.sh; p=$?; tests/eslint.sh; e=$?; tests/stylelint.sh && exit $((p || e))"
 	}
 }

@@ -1,0 +1,9 @@
+$plinthstack-demo-gap: 8px;
+
+.plinthstack-demo {
+	margin: $plinthstack-demo-gap;
+
+	&__item {
+		color: #fff;
+	}
+}

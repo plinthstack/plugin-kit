@@ -1,0 +1,3 @@
+color-hex-length
+declaration-block-no-duplicate-properties
+font-weight-notation

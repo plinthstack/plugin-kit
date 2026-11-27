@@ -1,0 +1,3 @@
+color-named
+rule-empty-line-before
+scss/selector-no-redundant-nesting-selector
